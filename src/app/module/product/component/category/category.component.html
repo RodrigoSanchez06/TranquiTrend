@@ -1,0 +1,34 @@
+<div>
+  <nav>
+    <div class="span-container color-blue">
+      <span class="navbar-text mb-0 h1 text-black text-bav"> TranquiTrend</span>
+    </div>
+  </nav>
+  <div class="card-container">
+    <div class="card-header">
+      <h3 class="text-center"><strong>Categories</strong></h3>
+    </div>
+    <div class="card-body">
+      <table class="table table-striped">
+        <thead>
+          <tr class="text-white">
+            <th scope="col">Category_id</th>
+            <th scope="col">Acronym</th>
+            <th scope="col">Category</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of categories; track item){
+          <tr class="table-default text-white">
+            <td>{{ item.category_id }}</td>
+            <td>{{ item.category }}</td>
+            <td>{{ item.acronym }}</td>
+            <td>{{ item.status }}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
