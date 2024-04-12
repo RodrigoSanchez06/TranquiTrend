@@ -99,7 +99,6 @@ export class CategoryComponent {
           text: e.error!.message,
           icon: 'error',
           showConfirmButton: true,
-          background: '#4d425f',
           color: 'white'
         });
       }
@@ -174,7 +173,6 @@ export class CategoryComponent {
       showConfirmButton: false,
       timer: 2200,
       toast: true,
-      background: '#4d425f',
       color: 'white'
     });
 
