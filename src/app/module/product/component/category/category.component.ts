@@ -1,6 +1,12 @@
 import { Component } from '@angular/core';
-import { Category } from '../../_model/Category';
 import { CategoryService } from '../../_service/category.service';
+import { Category } from '../../_model/category';
+import { FormBuilder, Validators } from '@angular/forms';
+import Swal from 'sweetalert2';
+import { SwalMessages } from '../../../commons/_dto/swal-message';
+
+declare var $: any;
+
 
 @Component({
   selector: 'app-category',
@@ -9,18 +15,182 @@ import { CategoryService } from '../../_service/category.service';
 })
 export class CategoryComponent {
 
+
   categories: Category[] = [];
-  
-  constructor(private categoryService: CategoryService) {
+
+  categoryToUpdate: number = 0;
+
+
+  form = this.formBuilder.group({
+    category: ["", [Validators.required]],
+    acronym: ["", [Validators.required]]
+
+
+  });
+
+  submitted = false;
+
+  swal: SwalMessages = new SwalMessages();
+
+  constructor(private categoryService: CategoryService, private formBuilder: FormBuilder) {
+
 
   }
 
   ngOnInit() {
-    this.categories = this.getCategories();
+    this.getCategories();
   }
 
-  getCategories(): Category[] {
-    return this.categoryService.getCategories();
+  disableCategory(id: number) {
+    this.swal.confirmMessage.fire({
+      title: 'Favor de confirmar la activación de la categoría',
+      icon: 'warning',
+      showCancelButton: true,
+      cancelButtonText: 'Cancelar',
+      confirmButtonText: 'Confirmar',
+    }).then((result: any) => {
+      if (result.isConfirmed) {
+        this.categoryService.disableCategory(id).subscribe({
+          next: (v) => {
+            this.swal.successMessage(v.body!.message); // show message
+            this.getCategories(); // reload regions
+          },
+          error: (e) => {
+            console.error(e);
+            this.swal.errorMessage(e.error!.message); // show message
+          }
+        });
+      }
+    });
+
   }
+
+  enableCategory(id: number) {
+    this.swal.confirmMessage.fire({
+      title: 'Favor de confirmar la activación de la category',
+      icon: 'warning',
+      showCancelButton: true,
+      cancelButtonText: 'Cancelar',
+      confirmButtonText: 'Confirmar',
+    }).then((result: any) => {
+      if (result.isConfirmed) {
+        this.categoryService.enableCategory(id).subscribe({
+          next: (v) => {
+            this.swal.successMessage(v.body!.message); // show message
+            this.getCategories(); // reload regions
+          },
+          error: (e) => {
+            console.error(e);
+            this.swal.errorMessage(e.error!.message); // show message
+          }
+        });
+      }
+    });
+  }
+
+
+  getCategories() {
+    this.categoryService.getCategories().subscribe({
+      next: (response) => {
+        this.categories = response.body!;
+      },
+      error: (e) => {
+        Swal.fire({
+          title: 'Error al conectar con el servidor',
+          text: e.error!.message,
+          icon: 'error',
+          showConfirmButton: true,
+          color: 'black'
+        });
+      }
+
+    })
+
+  }
+
+
+
+
+
+  onSubmit() {
+    this.submitted = true;
+    if (this.form.invalid) return;
+    this.submitted = false;
+
+    if (this.categoryToUpdate == 0) {
+      this.onSubmitCreate();
+    } else {
+      this.onSubmitUpdate();
+    }
+  }
+
+  onSubmitCreate() {
+    this.categoryService.createCategory(this.form.value).subscribe({
+      next: (v) => {
+        this.swal.successMessage(v.body!.message); // show message
+        this.getCategories(); // reload regions
+        this.hideModal(); // close modal
+      },
+      error: (e) => {
+        console.error(e);
+        this.swal.errorMessage(e.error!.message); // show message
+      }
+    });
+  }
+  onSubmitUpdate() {
+    // add region to region list
+    this.categoryService.updateCategory(this.form.value, this.categoryToUpdate).subscribe({
+      next: (v) => {
+        this.swal.successMessage("La categoria ha sido actualizada correctamente"); // show message
+        this.getCategories(); // reload regions
+        this.hideModal(); // close modal
+        this.categoryToUpdate = 0; // reset regionToUpdate
+      },
+      error: (e) => {
+        console.error(e);
+        this.swal.errorMessage("Error la categoria no puede ser Actualizada, intente de nuevo"); // show message
+      }
+    });
+  }
+
+  updateCategory(category: Category) {
+    this.categoryToUpdate = category.category_id;
+
+    this.form.reset();
+    this.form.controls['category'].setValue(category.category);
+    this.form.controls['acronym'].setValue(category.acronym);
+
+    this.submitted = false;
+    $("#categoryFormModal").modal("show");
+    $("#category-form-title").text("Update Category");
+    $("#modal-button").text("Update");
+  }
+
+  showNewCategoryAlert() {
+    Swal.fire({
+      position: 'top-end',
+      title: 'Success!',
+      text: 'La nueva categoria fue añadida correctamente!',
+      icon: 'success',
+      confirmButtonText: 'OK',
+      showConfirmButton: false,
+      timer: 2200,
+      toast: true,
+      color: 'white'
+    });
+
+  }
+
+  showModal() {
+    $('#categoryFormModal').modal("show");
+    this.form.reset();
+    this.submitted = false;
+    this.categoryToUpdate = 0;
+  }
+
+  hideModal() {
+    $('#categoryFormModal').modal("hide");
+  }
+
 
 }
