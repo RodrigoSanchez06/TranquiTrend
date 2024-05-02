@@ -25,7 +25,8 @@ export class SwalMessages {
             text: message,
             showConfirmButton: false,
             timer: 2000,
-            color: 'black'
+            background: '#4d425f',
+            color: 'white'
         });
     }
 
@@ -36,6 +37,8 @@ export class SwalMessages {
             icon: 'error',
             toast: true,
             text: message,
+            background: '#F8E8F8',
+            showConfirmButton: false,
             timer: 2000
         });
     }
