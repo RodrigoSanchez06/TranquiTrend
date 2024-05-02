@@ -43,7 +43,7 @@ export class CategoryComponent {
 
   disableCategory(id: number) {
     this.swal.confirmMessage.fire({
-      title: 'Favor de confirmar la activación de la categoría',
+      title: 'Por favor confirma la desactivacion de la categoria',
       icon: 'warning',
       showCancelButton: true,
       cancelButtonText: 'Cancelar',
@@ -52,12 +52,12 @@ export class CategoryComponent {
       if (result.isConfirmed) {
         this.categoryService.disableCategory(id).subscribe({
           next: (v) => {
-            this.swal.successMessage(v.body!.message); // show message
+            this.swal.successMessage("The caregory has been disabled"); // show message
             this.getCategories(); // reload regions
           },
           error: (e) => {
             console.error(e);
-            this.swal.errorMessage(e.error!.message); // show message
+            this.swal.errorMessage("Can't disable category if it has active products"); // show message
           }
         });
       }
@@ -67,11 +67,12 @@ export class CategoryComponent {
 
   enableCategory(id: number) {
     this.swal.confirmMessage.fire({
-      title: 'Favor de confirmar la activación de la category',
+      title: 'Please confirm the activation of the category',
       icon: 'warning',
       showCancelButton: true,
-      cancelButtonText: 'Cancelar',
-      confirmButtonText: 'Confirmar',
+      showConfirmButton: true,
+      cancelButtonText: 'Cancel',
+      confirmButtonText: 'Confirm',
     }).then((result: any) => {
       if (result.isConfirmed) {
         this.categoryService.enableCategory(id).subscribe({
@@ -88,7 +89,6 @@ export class CategoryComponent {
     });
   }
 
-
   getCategories() {
     this.categoryService.getCategories().subscribe({
       next: (response) => {
@@ -96,11 +96,12 @@ export class CategoryComponent {
       },
       error: (e) => {
         Swal.fire({
-          title: 'Error al conectar con el servidor',
+          title: 'Error connecting to the server',
           text: e.error!.message,
           icon: 'error',
           showConfirmButton: true,
-          color: 'black'
+          background: '#4d425f',
+          color: 'white'
         });
       }
 
@@ -127,13 +128,13 @@ export class CategoryComponent {
   onSubmitCreate() {
     this.categoryService.createCategory(this.form.value).subscribe({
       next: (v) => {
-        this.swal.successMessage(v.body!.message); // show message
+        this.swal.successMessage("La categoria ha sido añadida correctamente!"); // show message
         this.getCategories(); // reload regions
         this.hideModal(); // close modal
       },
       error: (e) => {
         console.error(e);
-        this.swal.errorMessage(e.error!.message); // show message
+        this.swal.errorMessage("Error, La categoria no puede ser creada, intentalo de nuevo"); // show message
       }
     });
   }
@@ -141,14 +142,14 @@ export class CategoryComponent {
     // add region to region list
     this.categoryService.updateCategory(this.form.value, this.categoryToUpdate).subscribe({
       next: (v) => {
-        this.swal.successMessage("La categoria ha sido actualizada correctamente"); // show message
+        this.swal.successMessage("La categoria ha sido actualizada correctamente!"); // show message
         this.getCategories(); // reload regions
         this.hideModal(); // close modal
         this.categoryToUpdate = 0; // reset regionToUpdate
       },
       error: (e) => {
         console.error(e);
-        this.swal.errorMessage("Error la categoria no puede ser Actualizada, intente de nuevo"); // show message
+        this.swal.errorMessage("Error la categoria no se ha actualizado, intentelo de nuevo"); // show message
       }
     });
   }
@@ -162,20 +163,21 @@ export class CategoryComponent {
 
     this.submitted = false;
     $("#categoryFormModal").modal("show");
-    $("#category-form-title").text("Update Category");
-    $("#modal-button").text("Update");
+    $("#category-form-title").text("Actualizar Categoria");
+    $("#modal-button").text("Actualizar");
   }
 
   showNewCategoryAlert() {
     Swal.fire({
       position: 'top-end',
       title: 'Success!',
-      text: 'La nueva categoria fue añadida correctamente!',
+      text: 'La categoria fue añadida correctamente!',
       icon: 'success',
       confirmButtonText: 'OK',
       showConfirmButton: false,
       timer: 2200,
       toast: true,
+      background: '#4d425f',
       color: 'white'
     });
 
@@ -183,6 +185,8 @@ export class CategoryComponent {
 
   showModal() {
     $('#categoryFormModal').modal("show");
+    $("#category-form-title").text("New Category");
+    $("#modal-button").text("Add");
     this.form.reset();
     this.submitted = false;
     this.categoryToUpdate = 0;
